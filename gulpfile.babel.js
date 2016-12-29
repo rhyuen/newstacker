@@ -8,7 +8,9 @@ import babel from "gulp-babel";
 import del from "del";
 import eslint from "gulp-eslint";
 import webpack from "webpack-stream";
+import mocha from "gulp-mocha";
 import webpackConfig from "./webpack.config.babel";
+
 
 const paths = {
   allSrcJs: "src/**/*.js",
@@ -20,6 +22,7 @@ const paths = {
   webpackFile: "webpack.config.babel.js",
   libDir: "lib",
   distDir: "dir",
+  allLibTests: "lib/test/**/*.js",
 };
 
 gulp.task("lint", () => {
@@ -27,6 +30,7 @@ gulp.task("lint", () => {
     paths.allSrcJs,
     paths.gulpFile,
     paths.webpackFile,
+    paths.allLibTests,
   ])
     .pipe(eslint())
     .pipe(eslint.format())
@@ -40,13 +44,18 @@ gulp.task("clean", () => {
   ]);
 });
 
+gulp.task("test", ["build"], () => {
+  gulp.src(paths.allLibTests)
+    .pipe(mocha());
+});
+
 gulp.task("build", ["lint", "clean"], () => {
   return gulp.src(paths.allSrcJs)
     .pipe(babel())
     .pipe(gulp.dest(paths.libDir));
 });
 
-gulp.task("main", ["lint", "clean"], () => {
+gulp.task("main", ["test"], () => {
   return gulp.src(paths.clientEntryPoint)
     .pipe(webpack(webpackConfig))
     .pipe(gulp.dest(paths.distDir));
