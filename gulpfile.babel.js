@@ -21,7 +21,7 @@ const paths = {
   gulpFile: "gulpfile.babel.js",
   webpackFile: "webpack.config.babel.js",
   libDir: "lib",
-  distDir: "dir",
+  distDir: "dist",
   allLibTests: "lib/test/**/*.js",
 };
 
@@ -30,7 +30,6 @@ gulp.task("lint", () => {
     paths.allSrcJs,
     paths.gulpFile,
     paths.webpackFile,
-    paths.allLibTests,
   ])
     .pipe(eslint())
     .pipe(eslint.format())
@@ -49,7 +48,7 @@ gulp.task("test", ["build"], () => {
     .pipe(mocha());
 });
 
-gulp.task("build", ["lint", "clean"], () => {
+gulp.task("build", ["clean", "lint"], () => {
   return gulp.src(paths.allSrcJs)
     .pipe(babel())
     .pipe(gulp.dest(paths.libDir));
